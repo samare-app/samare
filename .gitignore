@@ -1,0 +1,12 @@
+# Local scratch, never committed
+/tmp/
+
+# Rust
+/core/target/
+
+# Editors and OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+*:Zone.Identifier
