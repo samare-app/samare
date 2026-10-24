@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[package]
+name = "samare-ffi"
+description = "Samare FFI: UniFFI (Kotlin, Swift) and flutter_rust_bridge (Dart) bindings over samare-core."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[lib]
+name = "samare_ffi"
+# cdylib for Android (one .so shared by Kotlin and Dart), staticlib for iOS.
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[dependencies]
+samare-core.workspace = true
+
+[lints]
+workspace = true
