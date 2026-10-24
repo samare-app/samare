@@ -1,5 +1,7 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 name: samare
-description: "A new Flutter project."
+description: "Offline, serverless mesh messenger over Bluetooth LE."
 publish_to: 'none'
 version: 0.1.0+1
 

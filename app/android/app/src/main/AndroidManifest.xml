@@ -1,6 +1,14 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!-- Samare never talks to the network. Strip INTERNET if a library adds
+         it through manifest merging. Debug and profile builds still get it
+         from their own manifests, which take priority, for hot reload. -->
+    <uses-permission android:name="android.permission.INTERNET" tools:node="remove"/>
+
     <application
-        android:label="samare"
+        android:label="Samare"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
