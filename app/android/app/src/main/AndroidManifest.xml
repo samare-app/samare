@@ -7,10 +7,16 @@
          from their own manifests, which take priority, for hot reload. -->
     <uses-permission android:name="android.permission.INTERNET" tools:node="remove"/>
 
+    <!-- No system backup, to the cloud or to another phone: the database and
+         its keys never leave the device. dataExtractionRules covers Android 12+,
+         where allowBackup alone no longer blocks device-to-device transfer. -->
     <application
         android:label="Samare"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        tools:targetApi="31">
         <activity
             android:name=".MainActivity"
             android:exported="true"
