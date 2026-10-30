@@ -11,7 +11,7 @@ Ce document décrit ce qui est choisi, et pourquoi.
 3. **Aucune crypto maison** : uniquement des bibliothèques éprouvées et auditées.
 4. **Les relais ne voient rien** : ni contenu, ni expéditeur, ni destinataire identifiable.
 5. **Pas de numéro, pas d'e-mail, pas de compte** : l'identité est une paire de clés générée sur l'appareil.
-6. **Transparence** : code ouvert, modèle de menace publié en langage simple, état du maillage visible dans l'interface.
+6. **Transparence** : code ouvert, modèle de menace publié en langage simple (`docs/THREAT_MODEL.md`), état du maillage visible dans l'interface.
 
 ## 2. Fonctionnalités
 
@@ -33,12 +33,13 @@ Ce document décrit ce qui est choisi, et pourquoi.
 
 ### Sécurité pour les usages sensibles
 - Base de données locale chiffrée, déverrouillée par code.
-- **Mode discret** : icône et nom neutres.
+- **Mode discret** : icône et nom neutres. Il protège d'un coup d'œil, pas d'une fouille ni d'un scanner Bluetooth.
+- **Maillage coupé** : un interrupteur arrête toute émission Bluetooth.
 - **Code leurre** ouvrant un profil vide.
 - **Effacement rapide**.
 
 ### Événements
-- **Groupe officiel d'un événement** : annonces signées par la clé de l'organisateur, lecture seule pour les participants.
+- **Groupe officiel d'un événement** : annonces signées par la clé de l'organisateur, lecture seule pour les participants. Aucun accusé de livraison ni de lecture ne remonte à l'organisateur, qui ne sait donc pas qui a rejoint.
 - **SOS vers l'équipe sécurité ou prévention** de l'événement, à l'initiative de l'utilisateur, avec le contenu qu'il choisit.
 - **Point de rendez-vous** posé à la main dans un groupe (« scène B, bar de gauche »), sans position GPS.
 
@@ -80,16 +81,18 @@ Le transport ne fait que pousser et recevoir des octets ; toute la logique vit d
 
 ## 5. Chiffrement
 
-- **Lien entre voisins** : Noise (`snow`), qui chiffre le saut Bluetooth lui-même.
+- **Lien entre voisins** : Noise (`snow`), qui chiffre le saut Bluetooth lui-même, en-tête compris. Clés jetables à chaque connexion (motif `NN`) : une clé fixe deviendrait un identifiant permanent, visible de tout voisin. Le lien ne protège que de l'écoute passive ; l'authentification est laissée au bout en bout.
 - **Bout en bout 1:1** : double ratchet avec `vodozemac` (Olm), la bibliothèque Rust de Matrix, auditée et pensée pour l'asynchrone.
 - **Groupes** : Megolm (`vodozemac`). MLS suppose un ordre de livraison qu'un réseau sans serveur ne garantit pas.
+- **Enveloppe** : la sortie de `vodozemac` est chiffrée une seconde fois (AEAD de RustCrypto) avant d'entrer dans le paquet, sous une clé dérivée du secret partagé avec le contact ou du secret du groupe. Sans elle, un relais verrait la clé d'identité de l'expéditeur dans le premier message Olm, et la signature Ed25519 et le compteur de chaque message Megolm. Une signature se teste contre une liste de clés publiques connues et désigne alors son auteur.
+- Pas de chiffrement post-quantique : Olm, Megolm et Noise reposent sur Curve25519 et Ed25519.
 
 ## 6. Format des paquets
 
 - **Taille fixe**, ajustée au MTU Bluetooth, avec bourrage : tous les paquets se ressemblent. Les messages longs et les vocaux sont fragmentés.
 - En-tête en clair minimal :
   - version ;
-  - TTL (nombre de sauts restants) ;
+  - TTL (nombre de sauts restants), tiré au hasard dans une plage au départ : un voisin ne peut pas savoir s'il reçoit le paquet de son auteur ;
   - identifiant aléatoire du paquet (déduplication) ;
   - **étiquette de destinataire éphémère**.
 - **Aucun expéditeur en clair.**
@@ -112,9 +115,10 @@ Le transport ne fait que pousser et recevoir des octets ; toute la logique vit d
 
 ## 8. Stockage
 
-- SQLite chiffré (SQLCipher), clé dérivée du code de l'utilisateur (Argon2id).
-- Le profil leurre est une seconde base distincte.
-- L'effacement rapide détruit la clé, puis les fichiers.
+- SQLite chiffré (SQLCipher), clé aléatoire.
+- Cette clé est chiffrée par une clé dérivée du code de l'utilisateur (Argon2id), puis par une clé du Keystore Android (StrongBox quand il existe) ou de la Secure Enclave d'iOS, qui ne sort jamais du matériel. Copier les fichiers ne suffit donc pas pour essayer tous les codes sur un ordinateur : chaque essai passe par le téléphone.
+- Chaque installation crée deux bases de même taille, profil normal et profil leurre, que le code leurre serve ou non : l'existence de la seconde ne prouve rien.
+- L'effacement rapide détruit la clé matérielle et la clé chiffrée, puis les fichiers.
 
 ## 9. Android
 
@@ -128,6 +132,11 @@ Le transport ne fait que pousser et recevoir des octets ; toute la logique vit d
   - `CAMERA` (scan des QR), `RECORD_AUDIO` (talkie).
 - **`INTERNET` est retirée explicitement** du manifeste (`tools:node="remove"`), au cas où une bibliothèque l'ajouterait. La CI vérifie l'APK release. Flutter ajoute `INTERNET` aux builds debug et profile pour le rechargement à chaud, elle n'est jamais dans une build release. Chaque paquet Flutter ajouté est vérifié (pas de polices téléchargées, par exemple).
 - Service au premier plan de type `connectedDevice` pour le maillage en arrière-plan.
+- Annonce Bluetooth : l'UUID de service de Samare y figure forcément, sinon les téléphones ne se trouveraient pas ; la présence de l'appli se détecte donc à proximité. Tout le reste de l'annonce change en même temps que l'adresse Bluetooth, pour qu'aucune donnée fixe ne permette de suivre un téléphone.
+- Sauvegarde système désactivée (`allowBackup="false"`, et règles d'extraction qui excluent tout pour Android 12 et plus), vers le cloud comme vers un autre téléphone.
+- `FLAG_SECURE` : pas de capture d'écran, appli masquée dans les applis récentes.
+- Notifications sans contenu ni expéditeur par défaut.
+- Champs de saisie sans apprentissage du clavier (`enableIMEPersonalizedLearning: false`), demande que certains claviers ignorent.
 - QR : ZXing, qui marche hors-ligne et sans les services Google.
 - Import d'image : sélecteur de photos du système (aucune permission de stockage) et réception du partage depuis une autre appli.
 - Voix : Opus à bas débit (environ 6 à 8 kbit/s), durée plafonnée. L'encodeur Opus d'Android n'existe qu'à partir d'Android 10 : `libopus` est embarquée, dans le cœur Rust, pour servir aussi à iOS.
