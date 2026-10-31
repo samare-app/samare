@@ -1,0 +1,14 @@
+{# SPDX-License-Identifier: GPL-3.0-or-later #}
+{% component post_date(date) %}<time datetime="{{ date }}">{{ date | date(format="%d/%m/%Y") }}</time>{% endcomponent post_date %}
+
+{% component post_list(pages) %}
+{% if pages %}
+<ul class="posts">
+  {% for page in pages %}
+  <li>{{ <post_date date={page.date} /> }} <a href="{{ page.permalink | safe }}">{{ page.title }}</a></li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>Aucun billet pour l'instant.</p>
+{% endif %}
+{% endcomponent post_list %}

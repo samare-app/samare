@@ -10,3 +10,7 @@
 *.iml
 .DS_Store
 *:Zone.Identifier
+
+# Website: build output, and the threat model copied in at build time
+/site/public/
+/site/content/modele-de-menace.md

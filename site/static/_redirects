@@ -1,0 +1,3 @@
+# Served by git-pages (Codeberg Pages), Netlify-style syntax.
+# The site is deployed to both names; www sends visitors to the bare domain.
+//www.samare.app/* https://samare.app/:splat 301!

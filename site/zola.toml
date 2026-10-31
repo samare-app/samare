@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+base_url = "https://samare.app"
+title = "Samare"
+description = "Messagerie hors-ligne et sans serveur, en Bluetooth de téléphone en téléphone. Journal du projet."
+default_language = "fr"
+author = "Samare"
+generate_feeds = true
+feed_filenames = ["atom.xml"]
+
+[extra]
+mastodon_handle = "@samare@piaille.fr"
+mastodon_url = "https://piaille.fr/@samare"
+source_url = "https://github.com/cedricvoinnet/samare"

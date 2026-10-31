@@ -1,0 +1,9 @@
+{# SPDX-License-Identifier: GPL-3.0-or-later #}
+{% extends "base.html" %}
+
+{% block content %}
+{{ section.content | safe }}
+{% set blog = get_section(path="blog/_index.md") %}
+<h2><a href="{{ blog.permalink | safe }}">{{ blog.title }}</a></h2>
+{{ <post_list pages={blog.pages} /> }}
+{% endblock %}

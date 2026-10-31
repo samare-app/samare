@@ -1,0 +1,9 @@
+{# SPDX-License-Identifier: GPL-3.0-or-later #}
+{% extends "base.html" %}
+
+{% block title %}Page introuvable · {{ config.title }}{% endblock %}
+
+{% block content %}
+<h1>Page introuvable</h1>
+<p><a href="{{ get_url(path='') }}">Retour à l'accueil</a></p>
+{% endblock %}

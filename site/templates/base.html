@@ -1,0 +1,34 @@
+{# SPDX-License-Identifier: GPL-3.0-or-later #}
+<!doctype html>
+<html lang="{{ config.default_language }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ config.title }}{% endblock %}</title>
+  <meta name="description" content="{% block description %}{{ config.description }}{% endblock %}">
+  {# Mastodon credits the account on link previews of this site. #}
+  <meta name="fediverse:creator" content="{{ config.extra.mastodon_handle }}">
+  <link rel="stylesheet" href="{{ get_url(path='style.css', cachebust=true) }}">
+  <link rel="alternate" type="application/atom+xml" title="{{ config.title }}" href="{{ get_url(path='atom.xml', trailing_slash=false) }}">
+</head>
+<body>
+  <header>
+    <a class="site-title" href="{{ get_url(path='') }}">{{ config.title }}</a>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+  <footer>
+    <p>
+      {# rel="me" lets Mastodon verify that the account owns this site. #}
+      Suivre le projet : <a rel="me" href="{{ config.extra.mastodon_url }}">{{ config.extra.mastodon_handle }}</a>
+      ou le <a href="{{ get_url(path='atom.xml', trailing_slash=false) }}">flux Atom</a>.
+    </p>
+    <p>
+      Ce site ne dépose aucun cookie, ne charge rien depuis un autre site et ne mesure pas son audience.
+      Textes sous licence <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.fr">CC BY-SA 4.0</a>,
+      <a href="{{ config.extra.source_url }}">code</a> sous GPLv3 ou ultérieure.
+    </p>
+  </footer>
+</body>
+</html>
