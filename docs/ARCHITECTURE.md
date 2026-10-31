@@ -153,3 +153,13 @@ En arrière-plan, iOS ne scanne que l'UUID de service, au ralenti. L'annonce pas
 - au premier plan, l'iPhone n'annonce que l'UUID de service, et les autres lisent le reste par une caractéristique GATT.
 
 L'interface indique clairement « relais limité en arrière-plan ».
+
+## 11. Site web
+
+Le site `samare.app` est un site statique, sans traceur : aucun cookie, aucun script, aucune ressource chargée depuis un autre site, aucune mesure d'audience.
+
+- **Zola** : un seul binaire, sans dépendance à installer, version figée et vérifiée par somme de contrôle dans la CI. Gabarits maison, sans thème externe, polices du système.
+- **Le modèle de menace** est copié depuis `docs/` à chaque construction (`scripts/build-site.sh`) : le site n'en garde jamais une version périmée.
+- **Hébergement : Codeberg Pages**, tenu par une association à but non lucratif. La CI construit le site et pousse le résultat sur la branche `pages` d'un dépôt Codeberg, que le serveur récupère. Les visiteurs ne passent jamais par GitHub.
+- Une politique de sécurité du contenu (`site/static/_headers`) interdit au navigateur de charger quoi que ce soit d'ailleurs.
+- On suit le projet sur Mastodon ou par le flux Atom, sans liste d'e-mails.
