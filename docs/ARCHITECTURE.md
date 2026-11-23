@@ -158,7 +158,8 @@ L'interface indique clairement « relais limité en arrière-plan ».
 
 Le site `samare.app` est un site statique, sans traceur : aucun cookie, aucun script, aucune ressource chargée depuis un autre site, aucune mesure d'audience.
 
-- **Zola** : un seul binaire, sans dépendance à installer, version figée et vérifiée par somme de contrôle dans la CI. Gabarits maison, sans thème externe, polices du système.
+- **Zola** : un seul binaire, sans dépendance à installer, version figée et vérifiée par somme de contrôle dans la CI. Gabarits maison, sans thème externe.
+- **Polices Atkinson Hyperlegible Next et Mono**, hébergées sur le site lui-même (licence SIL OFL 1.1, fichiers de licence à côté des polices dans `site/static/fonts/`). Elles sont dessinées pour la lisibilité : les caractères qu'on confond souvent (I, l, 1, 0, O) se distinguent bien. Elles ne couvrent que l'alphabet latin : le cyrillique, le grec et les autres alphabets s'affichent dans la police du système. Le navigateur ne charge que les sous-ensembles dont la page a besoin, environ 140 Ko au plus.
 - **Le modèle de menace** est copié depuis `docs/` à chaque construction (`scripts/build-site.sh`) : le site n'en garde jamais une version périmée.
 - **Hébergement : Codeberg Pages**, tenu par une association à but non lucratif. La CI construit le site et pousse le résultat sur la branche `pages` d'un dépôt Codeberg, que le serveur récupère. Les visiteurs ne passent jamais par GitHub.
 - Une politique de sécurité du contenu (`site/static/_headers`) interdit au navigateur de charger quoi que ce soit d'ailleurs.
