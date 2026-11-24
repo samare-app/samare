@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+  <!-- The pair of samaras of the Samare logo: wings in the accent green, nutlets in ochre. -->
+  <g transform="translate(45 15) rotate(24) scale(.92)">
+    <path d="M0 -9 C6 -9 8 -3 7 5 L7 66 C7 77 -5 82 -13 75 C-23 64 -24 38 -14 19 C-10 12 -7 7 -7 0 C-7 -6 -4 -9 0 -9 Z" fill="#2d6a3e"/>
+    <ellipse cx="0" cy="-0.5" rx="7" ry="8.5" fill="#8a5300"/>
+  </g>
+  <g transform="translate(55 15) scale(-1 1) rotate(24) scale(.92)">
+    <path d="M0 -9 C6 -9 8 -3 7 5 L7 66 C7 77 -5 82 -13 75 C-23 64 -24 38 -14 19 C-10 12 -7 7 -7 0 C-7 -6 -4 -9 0 -9 Z" fill="#2d6a3e"/>
+    <ellipse cx="0" cy="-0.5" rx="7" ry="8.5" fill="#8a5300"/>
+  </g>
+</svg>

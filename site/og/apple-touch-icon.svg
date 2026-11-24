@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+  <!-- Source of site/static/apple-touch-icon.png, rendered once with:
+       resvg -w 180 site/og/apple-touch-icon.svg site/static/apple-touch-icon.png
+       The phone rounds the corners itself. -->
+  <rect width="180" height="180" fill="#f7f7f3"/>
+  <g transform="translate(30 37) scale(1.2)">
+    <g transform="translate(45 15) rotate(24) scale(.92)">
+      <path d="M0 -9 C6 -9 8 -3 7 5 L7 66 C7 77 -5 82 -13 75 C-23 64 -24 38 -14 19 C-10 12 -7 7 -7 0 C-7 -6 -4 -9 0 -9 Z" fill="#2d6a3e"/>
+      <ellipse cx="0" cy="-0.5" rx="7" ry="8.5" fill="#8a5300"/>
+      <path d="M-7 8 C-3 11 3 11 7 8 M3 12 C3 32 0 55 -6 71 M-3 12 C-7 30 -13 48 -17 61" fill="none" stroke="#f7f7f3" stroke-width="1.8" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(55 15) scale(-1 1) rotate(24) scale(.92)">
+      <path d="M0 -9 C6 -9 8 -3 7 5 L7 66 C7 77 -5 82 -13 75 C-23 64 -24 38 -14 19 C-10 12 -7 7 -7 0 C-7 -6 -4 -9 0 -9 Z" fill="#2d6a3e"/>
+      <ellipse cx="0" cy="-0.5" rx="7" ry="8.5" fill="#8a5300"/>
+      <path d="M-7 8 C-3 11 3 11 7 8 M3 12 C3 32 0 55 -6 71 M-3 12 C-7 30 -13 48 -17 61" fill="none" stroke="#f7f7f3" stroke-width="1.8" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>

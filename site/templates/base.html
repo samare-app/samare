@@ -1,19 +1,66 @@
 {# SPDX-License-Identifier: GPL-3.0-or-later #}
+{#- What link previews and search engines read: the page's own title and summary, else the site's. -#}
+{%- set share_title = config.title -%}
+{%- set share_description = config.description -%}
+{%- if page is defined -%}
+  {%- set share_title = page.title -%}
+  {%- if page.description -%}{%- set share_description = page.description -%}{%- endif -%}
+{%- elif section is defined and section.path != "/" -%}
+  {%- set share_title = section.title -%}
+  {%- if section.description -%}{%- set share_description = section.description -%}{%- endif -%}
+{%- endif -%}
 <!doctype html>
 <html lang="{{ config.default_language }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{{ config.title }}{% endblock %}</title>
-  <meta name="description" content="{% block description %}{{ config.description }}{% endblock %}">
+  <meta name="description" content="{{ share_description }}">
+  <meta name="theme-color" content="#f7f7f3" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#121411" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="{{ get_url(path='favicon.svg') }}" type="image/svg+xml">
+  <link rel="icon" href="{{ get_url(path='favicon-32.png') }}" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="{{ get_url(path='apple-touch-icon.png') }}">
+  {% if current_url is defined -%}
+  <link rel="canonical" href="{{ current_url | safe }}">
+  {#- Each page gets its own share card, drawn at build time by scripts/og-cards.py. #}
+  <meta property="og:site_name" content="{{ config.title }}">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:url" content="{{ current_url | safe }}">
+  <meta property="og:title" content="{{ share_title }}">
+  <meta property="og:description" content="{{ share_description }}">
+  {% if page is defined and page.date -%}
+  <meta property="og:type" content="article">
+  <meta property="article:published_time" content="{{ page.date }}">
+  {%- else -%}
+  <meta property="og:type" content="website">
+  {%- endif %}
+  <meta property="og:image" content="{{ current_url | safe }}og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Samare : {{ share_title }}">
+  <meta name="twitter:card" content="summary_large_image">
+  {%- endif %}
   {# Mastodon credits the account on link previews of this site. #}
   <meta name="fediverse:creator" content="{{ config.extra.mastodon_handle }}">
   <link rel="stylesheet" href="{{ get_url(path='style.css', cachebust=true) }}">
   <link rel="alternate" type="application/atom+xml" title="{{ config.title }}" href="{{ get_url(path='atom.xml', trailing_slash=false) }}">
 </head>
 <body>
-  <header>
-    <a class="site-title" href="{{ get_url(path='') }}">{{ config.title }}</a>
+  <header class="site-header">
+    <a class="site-title" href="{{ get_url(path='') }}">
+      {#- The pair of samaras, as in site/static/favicon.svg; colours come from style.css. #}
+      <svg class="mark" width="32" height="32" viewBox="0 0 100 100" aria-hidden="true">
+        <g transform="translate(45 15) rotate(24) scale(.92)"><path class="mark-wing" d="M0 -9 C6 -9 8 -3 7 5 L7 66 C7 77 -5 82 -13 75 C-23 64 -24 38 -14 19 C-10 12 -7 7 -7 0 C-7 -6 -4 -9 0 -9 Z"/><ellipse class="mark-seed" cx="0" cy="-0.5" rx="7" ry="8.5"/></g>
+        <g transform="translate(55 15) scale(-1 1) rotate(24) scale(.92)"><path class="mark-wing" d="M0 -9 C6 -9 8 -3 7 5 L7 66 C7 77 -5 82 -13 75 C-23 64 -24 38 -14 19 C-10 12 -7 7 -7 0 C-7 -6 -4 -9 0 -9 Z"/><ellipse class="mark-seed" cx="0" cy="-0.5" rx="7" ry="8.5"/></g>
+      </svg>
+      {{ config.title }}
+    </a>
+    <nav aria-label="Menu principal">
+      <a href="{{ get_url(path='@/blog/_index.md') }}">Journal</a>
+      <a href="{{ get_url(path='modele-de-menace/', trailing_slash=true) }}">Sécurité</a>
+      <a href="{{ config.extra.mastodon_url }}">Mastodon</a>
+    </nav>
   </header>
   <main>
     {% block content %}{% endblock %}
