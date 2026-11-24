@@ -5,6 +5,9 @@
 //! This crate holds all testable logic and has no FFI code. Bindings for
 //! Kotlin, Swift and Dart live in `samare-ffi`.
 
+pub mod contact_card;
+pub mod identity;
+
 /// Version of the core library.
 pub fn version() -> &'static str {
     env!("CARGO_PKG_VERSION")
