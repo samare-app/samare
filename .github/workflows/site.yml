@@ -9,12 +9,14 @@ on:
       - site/**
       - docs/THREAT_MODEL.md
       - scripts/build-site.sh
+      - scripts/og-cards.py
       - .github/workflows/site.yml
   pull_request:
     paths:
       - site/**
       - docs/THREAT_MODEL.md
       - scripts/build-site.sh
+      - scripts/og-cards.py
       - .github/workflows/site.yml
 
 permissions:
@@ -28,6 +30,9 @@ concurrency:
 env:
   ZOLA_VERSION: "0.23.6"
   ZOLA_SHA256: "8f5132b3522412d04e395e0b25f6d68613ad272a873e54a2b3ebf664873024a4"
+  # Draws the share cards (scripts/og-cards.py).
+  RESVG_VERSION: "0.49.0"
+  RESVG_SHA256: "216637e75e909e53e3098b0875cd5f7da2fdc8b4359771b4a29b539afff9d3f5"
 
 jobs:
   site:
@@ -42,6 +47,12 @@ jobs:
           echo "$ZOLA_SHA256  $RUNNER_TEMP/zola.tar.gz" | sha256sum -c -
           tar -xzf "$RUNNER_TEMP/zola.tar.gz" -C "$RUNNER_TEMP" zola
           echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+      - name: Install resvg
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/resvg.tar.gz" \
+            "https://github.com/linebender/resvg/releases/download/v$RESVG_VERSION/resvg-linux-x86_64.tar.gz"
+          echo "$RESVG_SHA256  $RUNNER_TEMP/resvg.tar.gz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/resvg.tar.gz" -C "$RUNNER_TEMP" resvg
       - run: scripts/build-site.sh
       # git-pages serves the "pages" branch of the Codeberg repository,
       # pulled on each push through a webhook. Skipped until the repository
