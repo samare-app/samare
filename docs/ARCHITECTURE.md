@@ -75,9 +75,15 @@ Le transport ne fait que pousser et recevoir des octets ; toute la logique vit d
 
 ## 4. Identité et contacts
 
-- Clés : Ed25519 (signature) et Curve25519 (échange de clés).
-- QR de contact : version, pseudo, clés publiques, empreinte, en encodage compact.
-- Empreinte lisible (« numéro de sécurité ») affichable pour une comparaison à la main.
+- **Clés** : l'identité est créée sur le téléphone. Elle tient en deux paires de clés des crates dalek : Ed25519 pour signer et X25519 pour l'accord de clés avec un contact. Deux identités sont la même personne seulement si leurs deux clés sont identiques.
+- L'identité est distincte du compte Olm de `vodozemac`. Les étiquettes de destinataire et l'enveloppe demandent un secret partagé avec le contact avant toute session Olm. Or `vodozemac` ne permet pas un Diffie-Hellman direct avec sa clé Curve25519 privée.
+- **QR de contact** : un lien `https://samare.app/c#…`. Scanné avec l'appareil photo par quelqu'un qui n'a pas Samare, il ouvre le site. Les données restent dans le fragment de l'URL. Un navigateur ne l'envoie jamais au serveur.
+- Le fragment contient en base64url sans bourrage : la version (1 octet), la clé Ed25519 (32), la clé X25519 (32), la longueur du pseudo (1) et le pseudo en UTF-8 (1 à 64 octets). La lecture refuse toute version inconnue et tout octet en trop. Le QR ne porte aucune clé Olm : la version permettra d'en ajouter avec les sessions chiffrées.
+- Le QR n'est pas signé. Qui peut remplacer un QR peut le remplacer en entier. Un contact se vérifie en scannant son téléphone en personne ou en comparant le numéro de sécurité.
+- **Pseudo** : 1 à 64 octets une fois les espaces du début et de la fin retirés. Les caractères de contrôle et les caractères invisibles de mise en forme sont refusés (espaces de largeur nulle, forçages du sens d'écriture). Ils permettraient de faire passer un pseudo pour un autre.
+- **Numéro de sécurité** : 60 chiffres en 12 groupes de 5, sur le modèle de Signal. Chaque identité a une empreinte de 30 chiffres tirée des deux clés publiques par SHA-512 appliqué 5 200 fois. Les itérations rendent plus coûteuse la recherche d'une autre clé qui donnerait la même empreinte. Le numéro met bout à bout les deux empreintes en commençant par la plus petite. Les deux téléphones affichent donc le même numéro.
+- Un lien et un numéro calculés sur des clés fixes servent de vecteur de test (`core/samare-core/src/contact_card.rs`). Une implémentation Python indépendante donne le même résultat.
+- Les clés et le pseudo ne s'affichent jamais dans les traces de débogage.
 
 ## 5. Chiffrement
 
