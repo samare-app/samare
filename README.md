@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/samares-sombre.png">
+    <img src="docs/images/samares-clair.png" width="720" alt="Deux samares accrochées par leurs graines, dessinées en caractères. « fais passer » est écrit dans une aile et des samares seules tombent en dessous.">
+  </picture>
+</p>
+
 # Samare
 
 Messagerie maillée **hors-ligne et sans serveur** : les messages passent de téléphone en téléphone en Bluetooth, relayés par les autres utilisateurs. Pensée pour les endroits où le réseau est saturé ou absent (festivals, montagne, manifestations).
