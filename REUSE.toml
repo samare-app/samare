@@ -1,0 +1,79 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Licensing of the files that cannot carry an SPDX header (binaries, JSON,
+# lock files, files that Flutter or Xcode regenerate) and of the prose.
+# Checked by `reuse lint` (https://reuse.software). When several entries
+# match a file, the last one wins.
+
+version = 1
+
+# Copyright of every file that does not state its own. This entry gives no
+# licence: a source file without its SPDX-License-Identifier fails the lint.
+[[annotations]]
+path = "**"
+precedence = "closest"
+SPDX-FileCopyrightText = "2026 The Samare authors"
+
+# Lock files and files written by tools (Cargo, pub, uv, Flutter, Xcode).
+[[annotations]]
+path = [
+    "core/Cargo.lock",
+    ".github/reuse/requirements.txt",
+    "app/pubspec.lock",
+    "app/.metadata",
+    "app/android/gradle/wrapper/gradle-wrapper.properties",
+    "app/ios/Flutter/AppFrameworkInfo.plist",
+    "app/ios/Runner/Info.plist",
+    "app/ios/Runner/Base.lproj/*.storyboard",
+    "app/ios/Runner/Assets.xcassets/**/Contents.json",
+    "app/ios/Runner/Assets.xcassets/LaunchImage.imageset/README.md",
+    "app/ios/Runner.xcodeproj/**",
+    "app/ios/Runner.xcworkspace/**",
+]
+precedence = "closest"
+SPDX-FileCopyrightText = "2026 The Samare authors"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+# Placeholder icons from the Flutter app template.
+[[annotations]]
+path = [
+    "app/android/app/src/main/res/mipmap-*/ic_launcher.png",
+    "app/ios/Runner/Assets.xcassets/**/*.png",
+]
+precedence = "override"
+SPDX-FileCopyrightText = "2014 The Flutter Authors"
+SPDX-License-Identifier = "BSD-3-Clause"
+
+# Project documentation.
+[[annotations]]
+path = ["README.md", "docs/ARCHITECTURE.md"]
+precedence = "closest"
+SPDX-FileCopyrightText = "2026 The Samare authors"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+# Website texts, the threat model included (published as a page).
+[[annotations]]
+path = ["site/content/**/*.md", "docs/THREAT_MODEL.md"]
+precedence = "closest"
+SPDX-FileCopyrightText = "2026 The Samare authors"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+# Website images drawn from the logo (site/static/favicon.svg).
+[[annotations]]
+path = ["site/static/favicon-32.png", "site/static/apple-touch-icon.png"]
+precedence = "closest"
+SPDX-FileCopyrightText = "2026 The Samare authors"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+# Fonts, served with their licence text.
+[[annotations]]
+path = ["site/**/atkinson-next*", "site/**/OFL-atkinson-next.txt"]
+precedence = "override"
+SPDX-FileCopyrightText = "2020-2024 The Atkinson Hyperlegible Next Project Authors (https://github.com/googlefonts/atkinson-hyperlegible-next)"
+SPDX-License-Identifier = "OFL-1.1"
+
+[[annotations]]
+path = ["site/**/atkinson-mono*", "site/**/OFL-atkinson-mono.txt"]
+precedence = "override"
+SPDX-FileCopyrightText = "2020-2024 The Atkinson Hyperlegible Mono Project Authors (https://github.com/googlefonts/atkinson-hyperlegible-next-mono)"
+SPDX-License-Identifier = "OFL-1.1"
