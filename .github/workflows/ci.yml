@@ -6,6 +6,11 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Weekly, so a new RustSec advisory or a broken toolchain shows up even
+  # when nothing is pushed.
+  schedule:
+    - cron: "17 5 * * 1"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -16,39 +21,137 @@ concurrency:
 
 env:
   FLUTTER_VERSION: "3.47.7"
+  # The NDK that Flutter pins (flutter.ndkVersion), used to link the core.
+  ANDROID_NDK_VERSION: "28.2.13676358"
+  # Tools downloaded from their GitHub releases, checked against these hashes.
+  CARGO_DENY_VERSION: "0.22.0"
+  CARGO_DENY_SHA256: "98c56e6a408bfa5c3c60744b6015aaa6aa08f743fdeb88386d06fca035bb1786"
+  ZIZMOR_VERSION: "1.32.0"
+  ZIZMOR_SHA256: "bb110cc765eca9cd7efb2e284a956be5974c60027b0970f16397d86208a9957b"
 
 jobs:
   core:
     name: Rust core
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: core
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       # rustup reads core/rust-toolchain.toml and installs the pinned version.
       - run: rustup show
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           workspaces: core
       - run: cargo fmt --all --check
+      # core/clippy.toml forbids println!, eprintln! and dbg!.
       - run: cargo clippy --workspace --all-targets --locked -- -D warnings
       - run: cargo test --workspace --locked
+
+  core-android:
+    name: Rust core for Android
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: core
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: rustup target add aarch64-linux-android armv7-linux-androideabi
+      - name: Install the NDK
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;$ANDROID_NDK_VERSION" >/dev/null
+          bin="$ANDROID_HOME/ndk/$ANDROID_NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          # API level 26: the app's minSdk (app/android/app/build.gradle.kts).
+          echo "CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=$bin/aarch64-linux-android26-clang" >> "$GITHUB_ENV"
+          echo "CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_LINKER=$bin/armv7a-linux-androideabi26-clang" >> "$GITHUB_ENV"
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          workspaces: core
+      - run: cargo build --workspace --locked --release --target aarch64-linux-android --target armv7-linux-androideabi
+
+  deny:
+    name: Rust dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install cargo-deny
+        run: |
+          name="cargo-deny-$CARGO_DENY_VERSION-x86_64-unknown-linux-musl"
+          curl -fsSL -o "$RUNNER_TEMP/cargo-deny.tar.gz" \
+            "https://github.com/EmbarkStudios/cargo-deny/releases/download/$CARGO_DENY_VERSION/$name.tar.gz"
+          echo "$CARGO_DENY_SHA256  $RUNNER_TEMP/cargo-deny.tar.gz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/cargo-deny.tar.gz" -C "$RUNNER_TEMP" --strip-components=1 "$name/cargo-deny"
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+      # Licences, banned network crates, RustSec advisories, sources:
+      # core/deny.toml.
+      - name: cargo deny
+        working-directory: core
+        run: cargo-deny --locked check
+
+  reuse:
+    name: Licence headers
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install reuse
+        run: |
+          python3 -m venv "$RUNNER_TEMP/reuse"
+          "$RUNNER_TEMP/reuse/bin/pip" install --quiet --require-hashes --no-deps -r .github/reuse/requirements.txt
+      # Every file must state its licence: an SPDX header, or REUSE.toml for
+      # the files that cannot carry one.
+      - run: '"$RUNNER_TEMP/reuse/bin/reuse" lint'
+
+  zizmor:
+    name: Workflow audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install zizmor
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/zizmor.tar.gz" \
+            "https://github.com/zizmorcore/zizmor/releases/download/v$ZIZMOR_VERSION/zizmor-x86_64-unknown-linux-gnu.tar.gz"
+          echo "$ZIZMOR_SHA256  $RUNNER_TEMP/zizmor.tar.gz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/zizmor.tar.gz" -C "$RUNNER_TEMP" zizmor
+      # The token lets zizmor check that each pinned SHA belongs to its action
+      # and that no pinned version has a known vulnerability.
+      - name: zizmor
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: '"$RUNNER_TEMP/zizmor" .'
 
   app:
     name: Flutter app
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: app
     steps:
-      - uses: actions/checkout@v5
-      - uses: subosito/flutter-action@v2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
-      - run: flutter pub get
+      # Fails if pubspec.lock would change: the CI uses the versions it pins.
+      - run: flutter pub get --enforce-lockfile
       - run: dart format --output=none --set-exit-if-changed lib test
       - run: flutter analyze
       - run: flutter test
@@ -56,22 +159,27 @@ jobs:
   android:
     name: Android release build
     runs-on: ubuntu-latest
-    needs: [core, app]
+    timeout-minutes: 30
+    # No needs: a failing job elsewhere must not hide a permission check.
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-java@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
         with:
           distribution: temurin
           java-version: "17"
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
       - name: Build release APK
         working-directory: app
-        run: flutter build apk --release
+        run: |
+          flutter pub get --enforce-lockfile
+          flutter build apk --release
       # Flutter adds INTERNET to debug and profile builds only: the check
       # runs on the release APK, which carries the merged manifest.
-      - name: Check permissions
+      - name: Check permissions and backup
         run: scripts/check-apk-permissions.sh app/build/app/outputs/flutter-apk/app-release.apk

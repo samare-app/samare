@@ -10,6 +10,7 @@ on:
       - docs/THREAT_MODEL.md
       - scripts/build-site.sh
       - scripts/og-cards.py
+      - scripts/check-site.py
       - .github/workflows/site.yml
   pull_request:
     paths:
@@ -17,6 +18,7 @@ on:
       - docs/THREAT_MODEL.md
       - scripts/build-site.sh
       - scripts/og-cards.py
+      - scripts/check-site.py
       - .github/workflows/site.yml
 
 permissions:
@@ -38,8 +40,11 @@ jobs:
   site:
     name: Build and publish
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Install Zola
         run: |
           curl -fsSL -o "$RUNNER_TEMP/zola.tar.gz" \
@@ -54,6 +59,8 @@ jobs:
           echo "$RESVG_SHA256  $RUNNER_TEMP/resvg.tar.gz" | sha256sum -c -
           tar -xzf "$RUNNER_TEMP/resvg.tar.gz" -C "$RUNNER_TEMP" resvg
       - run: scripts/build-site.sh
+      # No script and no resource from another domain in what gets published.
+      - run: python3 -I scripts/check-site.py site
       # git-pages serves the "pages" branch of the Codeberg repository,
       # pulled on each push through a webhook. Skipped until the repository
       # is set up (variable CODEBERG_PAGES_REPO, secret CODEBERG_DEPLOY_KEY).

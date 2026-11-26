@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# reuse lint, run by the CI. requirements.txt pins it with its dependencies
+# and their hashes. To update, from .github/reuse/:
+#   uv pip compile --universal --python-version 3.12 --generate-hashes requirements.in -o requirements.txt
+reuse==6.3.0

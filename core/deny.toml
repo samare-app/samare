@@ -1,0 +1,73 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# cargo-deny policy for the core: licences compatible with the GPLv3, no
+# crate that talks to the network, no known vulnerability, crates.io only.
+# Run from core/: cargo deny --locked check
+
+[graph]
+# Only the platforms the core ships on, plus the CI host for tests.
+targets = [
+    "x86_64-unknown-linux-gnu",
+    "aarch64-linux-android",
+    "armv7-linux-androideabi",
+    "aarch64-apple-ios",
+]
+all-features = true
+
+[advisories]
+# RustSec: vulnerabilities, unsound and unmaintained crates, yanked versions.
+# An exception goes in ignore, with the advisory id and the reason.
+yanked = "deny"
+ignore = []
+
+[licenses]
+# Every licence must be compatible with GPL-3.0-or-later: no GPL-2.0-only,
+# no non-free licence. Add a licence here only when a dependency needs it.
+allow = [
+    "Apache-2.0",
+    "BSD-3-Clause",
+    "MIT",
+    "Unicode-3.0",
+]
+confidence-threshold = 0.9
+
+[licenses.private]
+# The workspace's own crates (GPL-3.0-or-later, publish = false).
+ignore = true
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+allow-wildcard-paths = true
+# Samare never talks to the network. Any of these in the graph, even as an
+# indirect dependency, fails the build.
+deny = [
+    # HTTP clients and servers
+    { crate = "reqwest", reason = "network: HTTP client" },
+    { crate = "hyper", reason = "network: HTTP" },
+    { crate = "h2", reason = "network: HTTP/2" },
+    { crate = "h3", reason = "network: HTTP/3" },
+    { crate = "ureq", reason = "network: HTTP client" },
+    { crate = "isahc", reason = "network: HTTP client" },
+    { crate = "attohttpc", reason = "network: HTTP client" },
+    { crate = "surf", reason = "network: HTTP client" },
+    { crate = "curl", reason = "network: libcurl" },
+    { crate = "curl-sys", reason = "network: libcurl" },
+    { crate = "axum", reason = "network: HTTP server" },
+    { crate = "actix-web", reason = "network: HTTP server" },
+    { crate = "warp", reason = "network: HTTP server" },
+    # WebSocket, QUIC, TLS
+    { crate = "tungstenite", reason = "network: WebSocket" },
+    { crate = "quinn", reason = "network: QUIC" },
+    { crate = "rustls", reason = "network: TLS" },
+    { crate = "native-tls", reason = "network: TLS" },
+    { crate = "openssl-sys", reason = "network: TLS" },
+    # Telemetry and crash reporting
+    { crate = "sentry", reason = "network: crash reporting" },
+    { crate = "opentelemetry", reason = "network: telemetry" },
+]
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]

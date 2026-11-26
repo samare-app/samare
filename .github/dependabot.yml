@@ -1,0 +1,53 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Weekly update proposals. A release must be a week old before it is
+# proposed: a hijacked release is usually found and pulled within days.
+# The tools downloaded by the workflows (cargo-deny, zizmor, Zola, resvg)
+# and the Rust and Flutter versions are not covered: update them by hand.
+
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns: ["*"]
+
+  - package-ecosystem: cargo
+    directory: /core
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: build
+      include: scope
+
+  - package-ecosystem: pub
+    directory: /app
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: build
+      include: scope
+
+  # reuse, pinned with its dependencies for the CI.
+  - package-ecosystem: pip
+    directory: /.github/reuse
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: ci
+    groups:
+      reuse:
+        patterns: ["*"]

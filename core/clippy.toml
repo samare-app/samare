@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# No personal data in logs, even in debug builds: the core never prints.
+# Output to the user goes through the bindings, never through stdout/stderr.
+disallowed-macros = [
+    { path = "std::print", reason = "the core never prints: no personal data in logs" },
+    { path = "std::println", reason = "the core never prints: no personal data in logs" },
+    { path = "std::eprint", reason = "the core never prints: no personal data in logs" },
+    { path = "std::eprintln", reason = "the core never prints: no personal data in logs" },
+    { path = "std::dbg", reason = "the core never prints: no personal data in logs" },
+]
