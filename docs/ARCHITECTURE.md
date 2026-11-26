@@ -136,7 +136,7 @@ Le transport ne fait que pousser et recevoir des octets ; toute la logique vit d
   - `ACCESS_FINE_LOCATION` avec `android:maxSdkVersion="30"` ;
   - `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_CONNECTED_DEVICE`, `POST_NOTIFICATIONS` ;
   - `CAMERA` (scan des QR), `RECORD_AUDIO` (talkie).
-- **`INTERNET` est retirée explicitement** du manifeste (`tools:node="remove"`), au cas où une bibliothèque l'ajouterait. La CI vérifie l'APK release. Flutter ajoute `INTERNET` aux builds debug et profile pour le rechargement à chaud, elle n'est jamais dans une build release. Chaque paquet Flutter ajouté est vérifié (pas de polices téléchargées, par exemple).
+- **`INTERNET` est retirée explicitement** du manifeste (`tools:node="remove"`), au cas où une bibliothèque l'ajouterait. La CI vérifie l'APK release (section 12). Flutter ajoute `INTERNET` aux builds debug et profile pour le rechargement à chaud, elle n'est jamais dans une build release. Chaque paquet Flutter ajouté est vérifié (pas de polices téléchargées, par exemple).
 - Service au premier plan de type `connectedDevice` pour le maillage en arrière-plan.
 - Annonce Bluetooth : l'UUID de service de Samare y figure forcément, sinon les téléphones ne se trouveraient pas ; la présence de l'appli se détecte donc à proximité. Tout le reste de l'annonce change en même temps que l'adresse Bluetooth, pour qu'aucune donnée fixe ne permette de suivre un téléphone.
 - Sauvegarde système désactivée (`allowBackup="false"`, et règles d'extraction qui excluent tout pour Android 12 et plus), vers le cloud comme vers un autre téléphone.
@@ -170,4 +170,18 @@ Le site `samare.app` est un site statique, sans traceur : aucun cookie, aucun sc
 - **Une carte de partage par page** (1200×630) pour les aperçus de lien sur Mastodon et ailleurs. `scripts/og-cards.py` la dessine à la construction à partir des balises Open Graph de la page, et **resvg** la convertit en PNG : un seul binaire, version figée et vérifiée par somme de contrôle dans la CI, comme Zola. Les polices des cartes, au format TTF que resvg sait lire, sont dans `site/og/fonts/` et ne sont pas servies aux visiteurs.
 - **Hébergement : Codeberg Pages**, tenu par une association à but non lucratif. La CI construit le site et pousse le résultat sur la branche `pages` d'un dépôt Codeberg, que le serveur récupère. Les visiteurs ne passent jamais par GitHub.
 - Une politique de sécurité du contenu (`site/static/_headers`) interdit au navigateur de charger quoi que ce soit d'ailleurs.
+- La CI vérifie le site construit : aucun script ni aucune ressource d'un autre domaine (section 12).
 - On suit le projet sur Mastodon ou par le flux Atom, sans liste d'e-mails.
+
+## 12. Intégration continue
+
+La CI fait vérifier les principes non négociables par la machine. Elle tourne sur chaque PR, sur `main` et chaque lundi : une faille publiée ou un outil cassé se voit sans attendre un push.
+
+- **Cœur Rust** : `rustfmt`, `clippy` et les tests. `core/clippy.toml` interdit `print!`, `println!`, `eprint!`, `eprintln!` et `dbg!` : le cœur n'écrit jamais rien dans un journal. Le cœur est aussi compilé pour Android (`aarch64-linux-android`, `armv7-linux-androideabi`) avec le NDK que Flutter fige.
+- **Dépendances Rust** : `cargo-deny` (`core/deny.toml`) refuse une licence absente de sa liste, toutes compatibles avec la GPLv3. Il refuse aussi une crate qui fait du réseau (HTTP, TLS, WebSocket, QUIC, télémétrie), une faille connue de la base RustSec et toute source autre que crates.io.
+- **Licences des fichiers** : `reuse lint` exige que chaque fichier déclare sa licence. Les fichiers source portent leur en-tête SPDX. `REUSE.toml` couvre ceux qui ne peuvent pas en porter : images, polices, JSON, fichiers de verrouillage et fichiers générés par Flutter ou Xcode. Les textes des licences sont dans `LICENSES/`.
+- **APK release** : `scripts/check-apk-permissions.sh` lit le manifeste fusionné avec `aapt2`. Il refuse `INTERNET`, `ACCESS_FINE_LOCATION` au-delà d'Android 11 et toute permission absente de sa liste blanche. Il vérifie aussi que la sauvegarde système est coupée.
+- **Site** : `scripts/check-site.py` refuse dans le site construit tout script, tout gestionnaire d'événement et toute ressource chargée depuis un autre domaine.
+- **Chaîne d'approvisionnement** : chaque action est épinglée par le SHA de son commit. `zizmor` audite les workflows. Les outils téléchargés (cargo-deny, zizmor, Zola, resvg) ont une version figée et une somme de contrôle. `reuse` s'installe avec les hashes de toutes ses dépendances. `flutter pub get --enforce-lockfile` refuse un `pubspec.lock` qui changerait.
+- **Mises à jour** : Dependabot propose chaque semaine les mises à jour des actions, des crates, des paquets Dart et de `reuse`. Une version doit avoir une semaine avant d'être proposée : une version piégée est le plus souvent retirée en quelques jours.
+- Chaque job a une durée maximale. Les workflows n'ont que le droit de lire le dépôt.
