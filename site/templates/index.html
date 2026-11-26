@@ -2,8 +2,18 @@
 {% extends "base.html" %}
 
 {% block content %}
-{{ section.content | safe }}
+<section class="hero">
+  <div class="hero-art">{% include "hero.html" %}</div>
+  <div class="hero-text">
+    <p class="hero-kicker">Messagerie sans réseau · en développement</p>
+    <h1>Retrouve ton groupe et parle-lui, même quand le réseau ne passe plus.</h1>
+    {{ section.content | safe }}
+  </div>
+</section>
+{#- "Fais passer" in other languages, revealed while scrolling; decoration only. #}
+<p class="reveal" lang="en" aria-hidden="true">pass it on</p>
 {% set blog = get_section(path="blog/_index.md") %}
 <h2><a href="{{ blog.permalink | safe }}">{{ blog.title }}</a></h2>
 {{ <post_list pages={blog.pages} /> }}
+<p class="reveal reveal-end" lang="uk" aria-hidden="true">передай далі</p>
 {% endblock %}

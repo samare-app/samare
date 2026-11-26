@@ -4,6 +4,8 @@
 {% block title %}Page introuvable · {{ config.title }}{% endblock %}
 
 {% block content %}
-<h1>Page introuvable</h1>
-<p><a href="{{ get_url(path='') }}">Retour à l'accueil</a></p>
+{% set hero_phrases = false %}
+<div class="hero-art hero-404">{% include "hero.html" %}</div>
+<h1>Ce n'est pas la page que vous recherchez.</h1>
+<p>Elle s'est peut-être envolée. <a href="{{ get_url(path='') }}">Retour à l'accueil</a></p>
 {% endblock %}
