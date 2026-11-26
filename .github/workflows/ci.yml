@@ -169,6 +169,8 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
+          # Gradle dependencies and wrapper, keyed on the Gradle files.
+          cache: gradle
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
@@ -178,7 +180,8 @@ jobs:
         working-directory: app
         run: |
           flutter pub get --enforce-lockfile
-          flutter build apk --release
+          # One ABI is enough: the merged manifest is the same for all of them.
+          flutter build apk --release --target-platform android-arm64
       # Flutter adds INTERNET to debug and profile builds only: the check
       # runs on the release APK, which carries the merged manifest.
       - name: Check permissions and backup
