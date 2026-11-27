@@ -11,4 +11,4 @@ feed_filenames = ["atom.xml"]
 [extra]
 mastodon_handle = "@samare@piaille.fr"
 mastodon_url = "https://piaille.fr/@samare"
-source_url = "https://github.com/cedricvoinnet/samare"
+source_url = "https://github.com/samare-app/samare"

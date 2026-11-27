@@ -105,4 +105,4 @@ On n'a pas mesuré nous-mêmes la portée, le délai ni la consommation de batte
 
 ## Pourquoi on en parle
 
-On développe nous-mêmes une messagerie de ce type appelée Samare. On n'est donc pas neutres. On a commencé par regarder ce qui existe parce que ces projets font déjà beaucoup. Ils sont souvent portés par de toutes petites équipes. Ce que notre appli protégera et ce qu'elle ne protégera pas est décrit dans notre [modèle de menace](https://github.com/cedricvoinnet/samare/blob/main/docs/THREAT_MODEL.md). Pour suivre l'avancement, c'est sur [Mastodon](https://piaille.fr/@samare).
+On développe nous-mêmes une messagerie de ce type appelée Samare. On n'est donc pas neutres. On a commencé par regarder ce qui existe parce que ces projets font déjà beaucoup. Ils sont souvent portés par de toutes petites équipes. Ce que notre appli protégera et ce qu'elle ne protégera pas est décrit dans notre [modèle de menace](/modele-de-menace/). Pour suivre l'avancement, c'est sur [Mastodon](https://piaille.fr/@samare).

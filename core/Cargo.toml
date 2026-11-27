@@ -8,7 +8,7 @@ members = ["samare-core", "samare-ffi"]
 version = "0.1.0"
 edition = "2024"
 license = "GPL-3.0-or-later"
-repository = "https://github.com/cedricvoinnet/samare"
+repository = "https://github.com/samare-app/samare"
 publish = false
 
 [workspace.dependencies]
