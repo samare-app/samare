@@ -58,9 +58,10 @@ precedence = "closest"
 SPDX-FileCopyrightText = "2026 The Samare authors"
 SPDX-License-Identifier = "CC-BY-SA-4.0"
 
-# Website images drawn from the logo (site/static/favicon.svg).
+# Images drawn from the logo (site/static/favicon.svg) or from the samaras of the
+# home page (site/templates/hero.html).
 [[annotations]]
-path = ["site/static/favicon-32.png", "site/static/apple-touch-icon.png"]
+path = ["site/static/favicon-32.png", "site/static/apple-touch-icon.png", "docs/images/samares-*.png"]
 precedence = "closest"
 SPDX-FileCopyrightText = "2026 The Samare authors"
 SPDX-License-Identifier = "GPL-3.0-or-later"
