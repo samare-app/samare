@@ -58,6 +58,13 @@ precedence = "closest"
 SPDX-FileCopyrightText = "2026 The Samare authors"
 SPDX-License-Identifier = "CC-BY-SA-4.0"
 
+# Screenshots of the app mockup, shown in the blog posts.
+[[annotations]]
+path = "site/static/images/maquette/*.webp"
+precedence = "closest"
+SPDX-FileCopyrightText = "2026 The Samare authors"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
 # Images drawn from the logo (site/static/favicon.svg) or from the samaras of the
 # home page (site/templates/hero.html).
 [[annotations]]
